@@ -11,7 +11,7 @@ package org.expath.httpclient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.expath.httpclient.impl.ApacheHttpConnection;
+import org.expath.httpclient.impl.JavaHttpConnection;
 import org.expath.httpclient.impl.RequestParser;
 import org.expath.httpclient.model.Result;
 import org.expath.tools.model.Element;
@@ -116,12 +116,12 @@ public class HttpClient
     private Result sendOnce(Result result, URI uri, HttpRequest request, RequestParser parser)
             throws HttpClientException
     {
-        HttpConnection conn = new ApacheHttpConnection(uri);
+        HttpConnection conn = new JavaHttpConnection(uri);
         try {
             HttpResponse response = request.send(result, conn, parser.getCredentials());
             if ( response.getStatus() == 401 ) {
                 conn.disconnect();
-                conn = new ApacheHttpConnection(uri);
+                conn = new JavaHttpConnection(uri);
                 // create a new result, and throw the old one away
                 result = result.makeNewResult();
                 request.send(result, conn, parser.getCredentials());
