@@ -13,9 +13,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.message.BasicHeader;
 import org.expath.httpclient.ContentType;
+import org.expath.httpclient.HttpHeader;
 import org.expath.httpclient.HeaderSet;
 import org.expath.httpclient.HttpClientError;
 import org.expath.httpclient.HttpClientException;
@@ -67,7 +66,7 @@ public class MultipartRequestBody
             throws HttpClientException
     {
         // set the Content-Type header (if not set by the user)
-        @Nullable final Header explicitContentTypeHeader = headers.getFirstHeader("Content-Type");
+        @Nullable final HttpHeader explicitContentTypeHeader = headers.getFirstHeader("Content-Type");
 
         if ( explicitContentTypeHeader == null ) {
             StringBuilder type = new StringBuilder(getContentType());
@@ -84,7 +83,7 @@ public class MultipartRequestBody
         } else {
             // if the outer explicit http:header/@name="Content-Type" is not same as the http:multipart/@media-type then we have an invalid conflict
             final ContentType explicitContentType = ContentType.parse(explicitContentTypeHeader, null, null);
-            final ContentType multipartMediaType =  ContentType.parse(new BasicHeader("Content-Type", getContentType()), null, null);
+            final ContentType multipartMediaType =  ContentType.parse(new HttpHeader("Content-Type", getContentType()), null, null);
 
             if (!explicitContentType.getType().equals(multipartMediaType.getType())) {
                 throw new HttpClientException(HttpClientError.HC007, "http:header/@name=\"Content-Type\" is " + explicitContentType.getType() + ", but http:multipart/@media-type is " + multipartMediaType.getType());
@@ -172,7 +171,7 @@ public class MultipartRequestBody
     private void serializePartHeaders(OutputStream out, HeaderSet headers)
             throws IOException
     {
-        for ( Header h : headers ) {
+        for ( HttpHeader h : headers ) {
             out.write(h.getName().getBytes("US-ASCII"));
             out.write(COLON);
             out.write(h.getValue().getBytes("US-ASCII"));

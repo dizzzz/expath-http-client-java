@@ -11,8 +11,8 @@ package org.expath.httpclient.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.hc.core5.http.Header;
 import org.expath.httpclient.ContentType;
+import org.expath.httpclient.HttpHeader;
 import org.expath.httpclient.HeaderSet;
 import org.expath.httpclient.HttpClientError;
 import org.expath.httpclient.HttpClientException;
@@ -81,7 +81,7 @@ public class HttpRequestImpl
     private @Nullable ContentType getContentType(final HeaderSet headers)
             throws HttpClientException
     {
-        final Header header = headers.getFirstHeader("Content-Type");
+        final HttpHeader header = headers.getFirstHeader("Content-Type");
         return ContentType.parse(header, myOverrideType, myDefaultCharset);
     }
 

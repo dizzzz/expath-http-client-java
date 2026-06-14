@@ -9,11 +9,6 @@
 
 package org.expath.httpclient;
 
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.HeaderElement;
-import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.http.message.MessageSupport;
-
 import javax.annotation.Nullable;
 
 /**
@@ -33,7 +28,7 @@ public class ContentType {
         this.myBoundary = boundary;
     }
 
-    public static @Nullable ContentType parse(@Nullable final Header header, @Nullable final String overrideType, @Nullable final String defaultCharset) throws HttpClientException {
+    public static @Nullable ContentType parse(@Nullable final HttpHeader header, @Nullable final String overrideType, @Nullable final String defaultCharset) throws HttpClientException {
         final String type;
         final String charset;
         final String boundary;
@@ -51,17 +46,7 @@ public class ContentType {
                 if (header == null || !"Content-Type".equalsIgnoreCase(header.getName())) {
                     throw new HttpClientException(HttpClientError.HC001, "Header is not content type");
                 }
-                final HeaderElement[] headerElements = MessageSupport.parse(header);
-                if (headerElements.length > 1) {
-                    throw new HttpClientException(HttpClientError.HC001, "Multiple Content-Type headers");
-                }
-
-                final NameValuePair headerCharset = headerElements[0].getParameterByName("charset");
-                if (headerCharset != null) {
-                    charset = headerCharset.getValue();
-                } else {
-                    charset = defaultCharset;
-                }
+                charset = getParam(header.getValue(), "charset", defaultCharset);
             }
 
             // does the override contain a boundary?
@@ -72,13 +57,7 @@ public class ContentType {
                 if (header == null || !"Content-Type".equalsIgnoreCase(header.getName())) {
                     throw new HttpClientException(HttpClientError.HC001, "Header is not content type");
                 }
-                final HeaderElement[] headerElements = MessageSupport.parse(header);
-                if (headerElements.length > 1) {
-                    throw new HttpClientException(HttpClientError.HC001, "Multiple Content-Type headers");
-                }
-
-                final NameValuePair headerBoundary = headerElements[0].getParameterByName("boundary");
-                boundary = headerBoundary == null ? null : headerBoundary.getValue();
+                boundary = getParam(header.getValue(), "boundary", null);
             }
 
         } else {
@@ -91,27 +70,36 @@ public class ContentType {
                 throw new HttpClientException(HttpClientError.HC001, "Header is not Content-Type");
             }
 
-            final HeaderElement[] headerElements = MessageSupport.parse(header);
-            if (headerElements.length > 1) {
-                throw new HttpClientException(HttpClientError.HC001, "Multiple Content-Type headers");
-            }
-
             type = extractMediaTypeFromContentType(header.getValue());
-
-            // get the charset from the header or the default
-            final NameValuePair headerCharset = headerElements[0].getParameterByName("charset");
-            if (headerCharset != null) {
-                charset = headerCharset.getValue();
-            } else {
-                charset = defaultCharset;
-            }
-
-            // get the boundary from the header
-            final NameValuePair headerBoundary = headerElements[0].getParameterByName("boundary");
-            boundary = headerBoundary == null ? null : headerBoundary.getValue();
+            charset = getParam(header.getValue(), "charset", defaultCharset);
+            boundary = getParam(header.getValue(), "boundary", null);
         }
 
         return new ContentType(type, charset, boundary);
+    }
+
+    /**
+     * Extract a named parameter value from a header value string such as
+     * "text/html; charset=utf-8; boundary=something".
+     * Returns {@code defaultValue} when the parameter is absent.
+     */
+    private static @Nullable String getParam(final String headerValue, final String paramName, @Nullable final String defaultValue) {
+        if (headerValue == null) {
+            return defaultValue;
+        }
+        for (final String part : headerValue.split(";")) {
+            final String trimmed = part.trim();
+            final String prefix = paramName + "=";
+            if (trimmed.toLowerCase().startsWith(prefix.toLowerCase())) {
+                String value = trimmed.substring(prefix.length()).trim();
+                // strip surrounding quotes if present
+                if (value.startsWith("\"") && value.endsWith("\"") && value.length() >= 2) {
+                    value = value.substring(1, value.length() - 1);
+                }
+                return value;
+            }
+        }
+        return defaultValue;
     }
 
     private static String extractMediaTypeFromContentType(final String contentType) {

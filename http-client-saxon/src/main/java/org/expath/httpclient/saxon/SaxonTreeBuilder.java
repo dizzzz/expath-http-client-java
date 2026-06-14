@@ -10,8 +10,8 @@
 package org.expath.httpclient.saxon;
 
 import net.sf.saxon.expr.XPathContext;
-import org.apache.hc.core5.http.Header;
 import org.expath.httpclient.HeaderSet;
+import org.expath.httpclient.HttpHeader;
 import org.expath.httpclient.HttpClientError;
 import org.expath.httpclient.HttpClientException;
 import org.expath.httpclient.model.TreeBuilder;
@@ -37,7 +37,7 @@ public class SaxonTreeBuilder
     public void outputHeaders(HeaderSet headers)
             throws HttpClientException
     {
-        for ( Header h : headers ) {
+        for ( HttpHeader h : headers ) {
             assert h.getName() != null : "Header name cannot be null";
             String name = h.getName().toLowerCase();
             try {

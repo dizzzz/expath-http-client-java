@@ -19,7 +19,6 @@ import java.util.List;
 import org.expath.httpclient.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.hc.core5.http.Header;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.stream.EntityState;
 import org.apache.james.mime4j.stream.Field;
@@ -162,7 +161,7 @@ public class MultipartResponseBody implements HttpResponseBody {
 
     private HttpResponseBody makeResponsePart(final Result result, final HeaderSet headers, final MimeTokenStream parser)
             throws HttpClientException {
-        final Header h = headers.getFirstHeader("Content-Type");
+        final HttpHeader h = headers.getFirstHeader("Content-Type");
         if (h == null) {
             throw new HttpClientException(HttpClientError.HC002, "impossible to find the content type");
         }

@@ -10,11 +10,8 @@
 package org.expath.httpclient.impl;
 
 import org.slf4j.Logger;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.HeaderElement;
-import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.http.message.MessageSupport;
-import org.apache.hc.client5.http.cookie.Cookie;
+import org.expath.httpclient.HttpHeader;
+import java.net.HttpCookie;
 
 /**
  * Helper to log HTTP-specific stuff.
@@ -23,47 +20,41 @@ import org.apache.hc.client5.http.cookie.Cookie;
  */
 public class LoggerHelper
 {
-    public static void logCookies(Logger log, String prompt, Iterable<Cookie> cookies)
+    public static void logCookies(Logger log, String prompt, Iterable<HttpCookie> cookies)
     {
         if ( log.isDebugEnabled() ) {
             if ( cookies == null ) {
                 log.debug(prompt + ": null");
                 return;
             }
-            for ( Cookie c : cookies ) {
+            for ( HttpCookie c : cookies ) {
                 log.debug(prompt + ": " + c.getName() + ": " + c.getValue());
             }
         }
     }
 
-    public static void logHeaders(Logger log, String prompt, Header[] headers)
+    public static void logHeaders(Logger log, String prompt, HttpHeader[] headers)
     {
         if ( log.isDebugEnabled() ) {
             if ( headers == null ) {
                 log.debug(prompt + ": null");
                 return;
             }
-            for ( Header h : headers ) {
+            for ( HttpHeader h : headers ) {
                 log.debug(prompt + ": " + h.getName() + ": " + h.getValue());
             }
         }
     }
 
-    public static void logHeaderDetails(Logger log, String prompt, Iterable<Header> headers)
+    public static void logHeaderDetails(Logger log, String prompt, Iterable<HttpHeader> headers)
     {
         if ( log.isDebugEnabled() ) {
             if ( headers == null ) {
                 log.debug(prompt + ": null");
                 return;
             }
-            for ( Header h : headers ) {
+            for ( HttpHeader h : headers ) {
                 log.debug(prompt + " - HEADER: " + h.getName() + ": " + h.getValue());
-                for ( HeaderElement e : MessageSupport.parse(h) ) {
-                    log.debug(prompt + " -   ELEM: " + e.getName() + ": " + e.getValue());
-                    for ( NameValuePair p : e.getParameters() ) {
-                        log.debug(prompt + " -     P: " + p.getName() + ": " + p.getValue());
-                    }
-                }
             }
         }
     }

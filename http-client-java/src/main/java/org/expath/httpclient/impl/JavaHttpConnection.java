@@ -157,7 +157,7 @@ public class JavaHttpConnection
     @Override
     public void setRequestHeaders(final HeaderSet headers) throws HttpClientException
     {
-        for (final org.apache.hc.core5.http.Header h : headers) {
+        for (final org.expath.httpclient.HttpHeader h : headers) {
             myRequestHeaders.add(new String[]{ h.getName(), h.getValue() });
         }
     }

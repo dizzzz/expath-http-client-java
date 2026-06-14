@@ -13,11 +13,8 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.HeaderElement;
-import org.apache.hc.core5.http.message.BasicHeader;
-import org.apache.hc.core5.http.message.MessageSupport;
 import org.expath.httpclient.ContentType;
+import org.expath.httpclient.HttpHeader;
 import org.expath.httpclient.HeaderSet;
 import org.expath.httpclient.HttpClientError;
 import org.expath.httpclient.HttpClientException;
@@ -168,7 +165,7 @@ public class BodyFactory {
      * @throws HttpClientException if the headers are null
      */
     public static Type parseType(final HeaderSet headers) throws HttpClientException {
-        final Header h = headers.getFirstHeader("Content-Type");
+        final HttpHeader h = headers.getFirstHeader("Content-Type");
         if (h == null) {
             throw new HttpClientException(HttpClientError.HC001, "impossible to find the content type");
         }
@@ -211,20 +208,16 @@ public class BodyFactory {
             if (mediaType == null) {
                 throw new HttpClientException(HttpClientError.HC001, "@media-type is not set on http:body");
             }
-            final Header mediaTypeHeader = new BasicHeader("Media-Type", mediaType);
-            final HeaderElement[] mediaTypeHeaderElems = MessageSupport.parse(mediaTypeHeader);
-            if (mediaTypeHeaderElems == null || mediaTypeHeaderElems.length == 0) {
+            final String mimeType = mediaType.contains(";") ? mediaType.substring(0, mediaType.indexOf(';')).trim() : mediaType.trim();
+            if (mimeType.isEmpty()) {
                 throw new HttpClientException(HttpClientError.HC001, "@media-type is not set on http:body");
-            } else if (mediaTypeHeaderElems.length > 1) {
-                throw new HttpClientException(HttpClientError.HC001, "Multiple @media-type internet media types present");
-            } else {
-                final Type type = parseType(mediaTypeHeaderElems[0].getName());
-                if (type == Type.MULTIPART) {
-                    final String msg = "multipart type not allowed for http:body: " + mediaType;
-                    throw new HttpClientException(HttpClientError.HC001, msg);
-                }
-                return type;
             }
+            final Type type = parseType(mimeType);
+            if (type == Type.MULTIPART) {
+                final String msg = "multipart type not allowed for http:body: " + mediaType;
+                throw new HttpClientException(HttpClientError.HC001, msg);
+            }
+            return type;
         }
     }
 

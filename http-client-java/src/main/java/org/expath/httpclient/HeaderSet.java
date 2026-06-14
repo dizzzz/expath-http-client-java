@@ -10,31 +10,27 @@
 package org.expath.httpclient;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.HeaderElement;
-import org.apache.hc.core5.http.message.BasicHeader;
 
 /**
  * TODO: Doc...
  *
- * TODO: Change this class to a real wrapper around a {@link Header[]} or a
- * {@link Collection}&lt;Header&gt;.
+ * TODO: Change this class to a real wrapper around a {@link HttpHeader[]} or a
+ * {@link Collection}&lt;HttpHeader&gt;.
  *
  * @author Florent Georges
  */
 public class HeaderSet
-        implements Iterable<Header>
+        implements Iterable<HttpHeader>
 {
     /**
      * Build a new object with no header.
      */
     public HeaderSet()
     {
-        myHeaders = new ArrayList<Header>();
+        myHeaders = new ArrayList<HttpHeader>();
     }
 
     /**
@@ -43,14 +39,16 @@ public class HeaderSet
      * @param headers the headers to add to the set
      * @throws HttpClientException if the headers are null
      */
-    public HeaderSet(Header[] headers)
+    public HeaderSet(HttpHeader[] headers)
             throws HttpClientException
     {
         if ( headers == null ) {
             throw new HttpClientException(HttpClientError.HC005, "Headers array is null");
         }
-        myHeaders = new ArrayList<Header>(headers.length);
-        myHeaders.addAll(Arrays.asList(headers));
+        myHeaders = new ArrayList<HttpHeader>(headers.length);
+        for (final HttpHeader h : headers) {
+            myHeaders.add(h);
+        }
     }
 
     /**
@@ -59,23 +57,23 @@ public class HeaderSet
      * @param headers the headers to add to the set
      * @throws HttpClientException if the headers are null
      */
-    public HeaderSet(Collection<Header> headers)
+    public HeaderSet(Collection<HttpHeader> headers)
             throws HttpClientException
     {
         if ( headers == null ) {
             throw new HttpClientException(HttpClientError.HC005, "Headers list is null");
         }
-        myHeaders = new ArrayList<Header>(headers);
+        myHeaders = new ArrayList<HttpHeader>(headers);
     }
 
-    public Iterator<Header> iterator()
+    public Iterator<HttpHeader> iterator()
     {
         return myHeaders.iterator();
     }
 
-    public Header[] toArray()
+    public HttpHeader[] toArray()
     {
-        return myHeaders.toArray(new Header[0]);
+        return myHeaders.toArray(new HttpHeader[0]);
     }
 
     public boolean isEmpty()
@@ -83,23 +81,23 @@ public class HeaderSet
         return myHeaders.isEmpty();
     }
 
-    public Header add(Header h)
+    public HttpHeader add(HttpHeader h)
     {
         myHeaders.add(h);
         return h;
     }
 
-    public Header add(String name, String value)
+    public HttpHeader add(String name, String value)
     {
-        Header h = new BasicHeader(name, value);
+        HttpHeader h = new HttpHeader(name, value);
         myHeaders.add(h);
         return h;
     }
 
-    public Header getFirstHeader(String name)
+    public HttpHeader getFirstHeader(String name)
             throws HttpClientException
     {
-        for ( Header h : myHeaders ) {
+        for ( HttpHeader h : myHeaders ) {
             if ( name.equalsIgnoreCase(h.getName()) ) {
                 return h;
             }
@@ -107,7 +105,7 @@ public class HeaderSet
         return null;
     }
 
-    private List<Header> myHeaders;
+    private List<HttpHeader> myHeaders;
 }
 
 

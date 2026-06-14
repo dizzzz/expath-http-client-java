@@ -1,43 +1,40 @@
 /****************************************************************************/
-/*  File:       AnyEntityMethod.java                                        */
-/*  Author:     F. Georges - fgeorges.org                                   */
-/*  Date:       2009-11-18                                                  */
+/*  File:       HttpHeader.java                                             */
+/*  Author:     EXPath contributors                                         */
+/*  Date:       2024                                                        */
 /*  Tags:                                                                   */
-/*      Copyright (c) 2009 Florent Georges (see end of file.)               */
+/*      Copyright (c) 2024 EXPath contributors (see end of file.)           */
 /* ------------------------------------------------------------------------ */
 
 
-package org.expath.httpclient.impl;
-
-import java.net.URI;
-import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
+package org.expath.httpclient;
 
 /**
- * Implements any HTTP extension method, without any entity content.
+ * A simple HTTP header name/value pair, independent of any HTTP client library.
  *
- * The above point will maybe require to have an empty {@code http:request/http:body}
- * on requests with a method allowing body, but with an empty body.  So at
- * runtime if we do not know the method, we can at least choose between the base
- * classes {@code HttpRequestBase} and {@code HttpEntityEnclosingRequestBase}.
- *
- * @author Florent Georges
+ * @author EXPath contributors
  */
-public class AnyEntityMethod
-        extends BasicClassicHttpRequest
-{
-    public AnyEntityMethod(String method)
-    {
-        super(method, (String) null);
+public class HttpHeader {
+
+    private final String myName;
+    private final String myValue;
+
+    public HttpHeader(final String name, final String value) {
+        this.myName = name;
+        this.myValue = value;
     }
 
-    public AnyEntityMethod(String method, URI uri)
-    {
-        super(method, uri);
+    public String getName() {
+        return myName;
     }
 
-    public AnyEntityMethod(String method, String uri)
-    {
-        super(method, URI.create(uri));
+    public String getValue() {
+        return myValue;
+    }
+
+    @Override
+    public String toString() {
+        return myName + ": " + myValue;
     }
 }
 
@@ -57,7 +54,7 @@ public class AnyEntityMethod
 /*                                                                          */
 /*  The Original Code is: all this file.                                    */
 /*                                                                          */
-/*  The Initial Developer of the Original Code is Florent Georges.          */
+/*  The Initial Developer of the Original Code is EXPath contributors.      */
 /*                                                                          */
 /*  Contributor(s): none.                                                   */
 /* ------------------------------------------------------------------------ */
